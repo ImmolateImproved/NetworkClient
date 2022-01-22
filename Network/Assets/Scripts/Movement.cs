@@ -2,21 +2,33 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
+    private Rigidbody2D rb;
+
     [SerializeField]
-    private float speed;
+    private float lerpSpeed;
 
     [SerializeField]
     private float serverSpeed;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
+
+    public void SetVelocity(Vector2 velocity)
+    {
+        rb.velocity = velocity * serverSpeed;
+    }
 
     public void Move(Vector2 position)
     {
         if (Vector2.Distance(transform.position, position) < serverSpeed)
         {
-            transform.position = Vector3.MoveTowards(transform.position, position, speed * Time.deltaTime);
+            rb.MovePosition(Vector3.MoveTowards(rb.position, position, lerpSpeed * Time.deltaTime));
         }
         else
         {
-            transform.position = position;
+            rb.MovePosition(position);
         }
     }
 }

@@ -50,6 +50,8 @@ public class NetworkPlayer : MonoBehaviour
         {
             var direction = playerInput.GetInput();
 
+            movement.SetVelocity(direction);
+
             networkObjectManager.SendInput(direction);
 
             yield return sendRateHandel;
