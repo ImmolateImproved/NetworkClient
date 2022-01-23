@@ -10,6 +10,7 @@ public struct LocalPlayer
 {
     public byte id;
     public Vector2 position;
+    public float angle;
 }
 
 [CreateAssetMenu(menuName = "ScriptableObjects/Systems/NetworkObjectManager")]
@@ -42,7 +43,7 @@ public class NetworkObjectManager : SystemBase
 
     public override void MyOnDisable()
     {
-        networkManager.Off((int)mes_type.Move, ReceiveMovement);
+        networkManager.Off((int)message_type.Move, ReceiveMovement);
     }
 
     public void SpawnNetworkObject(byte id, bool isMine)
@@ -62,9 +63,9 @@ public class NetworkObjectManager : SystemBase
         players.Add(id, localPlayer);
     }
 
-    public void SendInput(Vector2 direction)
+    public void SendInput(Vector2 direction, float angle)
     {
-        var data = CreateInputMessage(direction, lastSendMessageId);
+        var data = CreateInputMessage(direction, angle, lastSendMessageId);
 
         lastSendMessageId++;
 
@@ -88,9 +89,11 @@ public class NetworkObjectManager : SystemBase
         {
             var localObject = ToLocalObject(serverMessage.Objects(i).Value);
 
+            Debug.Log(localObject.angle);
+
             if (players.TryGetValue(localObject.id, out var netOjbect))
             {
-                netOjbect.ReceivePosition(localObject.position);
+                netOjbect.ReceivePosition(localObject.position, localObject.angle);
             }
             else
             {
@@ -104,13 +107,14 @@ public class NetworkObjectManager : SystemBase
         return new LocalPlayer
         {
             id = netObject.Id,
-            position = new Vector2(netObject.X, netObject.Y)
+            position = new Vector2(netObject.X, netObject.Y),
+            angle = netObject.Ang
         };
     }
 
-    private byte[] CreateInputMessage(Vector2 direction, uint lastMessageId)
+    private byte[] CreateInputMessage(Vector2 direction, float angle, uint lastMessageId)
     {
-        var data = SerializeDirection(direction);
+        var data = SerializeDirection(direction, angle);
 
         fb.Clear();
 
@@ -122,13 +126,13 @@ public class NetworkObjectManager : SystemBase
         return fb.SizedByteArray();
     }
 
-    private byte[] SerializeDirection(Vector2 direction)
+    private byte[] SerializeDirection(Vector2 direction, float angle)
     {
         fb.Clear();
 
         var input = PlayerInput.directionMap[direction];
 
-        var msgOffset = Move.CreateMove(fb, input);
+        var msgOffset = Move.CreateMove(fb, input, angle);
         Move.FinishMoveBuffer(fb, msgOffset);
 
         var data = fb.SizedByteArray();

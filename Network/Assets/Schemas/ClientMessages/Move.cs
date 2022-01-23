@@ -20,16 +20,20 @@ public struct Move : IFlatbufferObject
   public Move __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public ClientMessages.vector Pos { get { int o = __p.__offset(4); return o != 0 ? (ClientMessages.vector)__p.bb.GetSbyte(o + __p.bb_pos) : ClientMessages.vector.Zero; } }
+  public float Ang { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
 
   public static Offset<ClientMessages.Move> CreateMove(FlatBufferBuilder builder,
-      ClientMessages.vector pos = ClientMessages.vector.Zero) {
-    builder.StartTable(1);
+      ClientMessages.vector pos = ClientMessages.vector.Zero,
+      float ang = 0.0f) {
+    builder.StartTable(2);
+    Move.AddAng(builder, ang);
     Move.AddPos(builder, pos);
     return Move.EndMove(builder);
   }
 
-  public static void StartMove(FlatBufferBuilder builder) { builder.StartTable(1); }
+  public static void StartMove(FlatBufferBuilder builder) { builder.StartTable(2); }
   public static void AddPos(FlatBufferBuilder builder, ClientMessages.vector pos) { builder.AddSbyte(0, (sbyte)pos, 0); }
+  public static void AddAng(FlatBufferBuilder builder, float ang) { builder.AddFloat(1, ang, 0.0f); }
   public static Offset<ClientMessages.Move> EndMove(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<ClientMessages.Move>(o);

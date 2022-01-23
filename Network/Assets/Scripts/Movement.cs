@@ -15,6 +15,16 @@ public class Movement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    private void Update()
+    {
+        var mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0;
+
+        var directionToMouse = (mouseWorldPos - transform.position).normalized;
+
+        transform.up = directionToMouse;
+    }
+
     public void SetVelocity(Vector2 velocity)
     {
         rb.velocity = velocity * serverSpeed;
@@ -30,5 +40,10 @@ public class Movement : MonoBehaviour
         {
             rb.MovePosition(position);
         }
+    }
+
+    public void Rotate(float angle)
+    {
+        transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 }

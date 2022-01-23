@@ -19,7 +19,7 @@ public struct Message : IFlatbufferObject
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
   public Message __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
-  public ServerMessages.Game_Object? Objects(int j) { int o = __p.__offset(4); return o != 0 ? (ServerMessages.Game_Object?)(new ServerMessages.Game_Object()).__assign(__p.__vector(o) + j * 12, __p.bb) : null; }
+  public ServerMessages.Game_Object? Objects(int j) { int o = __p.__offset(4); return o != 0 ? (ServerMessages.Game_Object?)(new ServerMessages.Game_Object()).__assign(__p.__vector(o) + j * 16, __p.bb) : null; }
   public int ObjectsLength { get { int o = __p.__offset(4); return o != 0 ? __p.__vector_len(o) : 0; } }
 
   public static Offset<ServerMessages.Message> CreateMessage(FlatBufferBuilder builder,
@@ -31,7 +31,7 @@ public struct Message : IFlatbufferObject
 
   public static void StartMessage(FlatBufferBuilder builder) { builder.StartTable(1); }
   public static void AddObjects(FlatBufferBuilder builder, VectorOffset objectsOffset) { builder.AddOffset(0, objectsOffset.Value, 0); }
-  public static void StartObjectsVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(12, numElems, 4); }
+  public static void StartObjectsVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(16, numElems, 4); }
   public static Offset<ServerMessages.Message> EndMessage(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<ServerMessages.Message>(o);

@@ -20,9 +20,11 @@ public struct Game_Object : IFlatbufferObject
   public byte ObjType { get { return __p.bb.Get(__p.bb_pos + 1); } }
   public float X { get { return __p.bb.GetFloat(__p.bb_pos + 4); } }
   public float Y { get { return __p.bb.GetFloat(__p.bb_pos + 8); } }
+  public float Ang { get { return __p.bb.GetFloat(__p.bb_pos + 12); } }
 
-  public static Offset<ServerMessages.Game_Object> CreateGame_Object(FlatBufferBuilder builder, byte Id, byte ObjType, float X, float Y) {
-    builder.Prep(4, 12);
+  public static Offset<ServerMessages.Game_Object> CreateGame_Object(FlatBufferBuilder builder, byte Id, byte ObjType, float X, float Y, float Ang) {
+    builder.Prep(4, 16);
+    builder.PutFloat(Ang);
     builder.PutFloat(Y);
     builder.PutFloat(X);
     builder.Pad(2);

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Cinemachine;
+using System.Collections;
 using UnityEngine;
 
 public class NetworkPlayer : MonoBehaviour
@@ -10,10 +11,17 @@ public class NetworkPlayer : MonoBehaviour
 
     private int id;
 
+    private bool isMine;
+
     [SerializeField]
     private float sendRate;
 
     private WaitForSeconds sendRateHandel;
+
+    private Coroutine receiveMovementCoroutine;
+
+    [SerializeField]
+    private GameObject crossHair;
 
     private void Awake()
     {
@@ -24,22 +32,33 @@ public class NetworkPlayer : MonoBehaviour
 
         sendRateHandel = new WaitForSeconds(1 / sendRate);
 
-        StartCoroutine(SendInputRoutine());
+        receiveMovementCoroutine = StartCoroutine(SendInputRoutine());
     }
 
     public void Init(int id, bool isMine)
     {
         this.id = id;
 
-        playerInput.enabled = isMine;
+        this.isMine = isMine;
 
         if (isMine)
-            Camera.main.transform.SetParent(transform);
+        {
+            FindObjectOfType<CinemachineVirtualCamera>().Follow = transform;
+        }
+        else
+        {
+            movement.enabled = false;
+            crossHair.SetActive(false);
+            StopCoroutine(receiveMovementCoroutine);
+        }
     }
 
-    public void ReceivePosition(Vector2 position)
+    public void ReceivePosition(Vector2 position, float angle)
     {
         movement.Move(position);
+
+        if (isMine)
+            movement.Rotate(angle);
     }
 
     private IEnumerator SendInputRoutine()
@@ -52,7 +71,7 @@ public class NetworkPlayer : MonoBehaviour
 
             movement.SetVelocity(direction);
 
-            networkObjectManager.SendInput(direction);
+            networkObjectManager.SendInput(direction, transform.eulerAngles.z);
 
             yield return sendRateHandel;
         }
