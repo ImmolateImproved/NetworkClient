@@ -4,42 +4,43 @@ using UnityEngine;
 
 public class NetworkPlayer : MonoBehaviour
 {
-    private NetworkObjectManager networkObjectManager;
+    private NetworkMovementManager networkMovementManager;
 
     private PlayerInput playerInput;
     private Movement movement;
+
+    [SerializeField]
+    private float sendRate;
 
     private int id;
 
     private bool isMine;
 
-    [SerializeField]
-    private float sendRate;
+    private Coroutine sendInputCoroutine;
 
-    private WaitForSeconds sendRateHandel;
-
-    private Coroutine receiveMovementCoroutine;
+    private SpriteRenderer sr;
 
     [SerializeField]
     private GameObject crossHair;
 
     private void Awake()
     {
-        networkObjectManager = SystemsManager.GetSystem<NetworkObjectManager>();
+        networkMovementManager = SystemsManager.GetSystem<NetworkMovementManager>();
 
         playerInput = GetComponent<PlayerInput>();
         movement = GetComponent<Movement>();
+        sr = GetComponent<SpriteRenderer>();
 
-        sendRateHandel = new WaitForSeconds(1 / sendRate);
-
-        receiveMovementCoroutine = StartCoroutine(SendInputRoutine());
+        sendInputCoroutine = StartCoroutine(SendInputRoutine());
     }
 
-    public void Init(int id, bool isMine)
+    public void Init(int id, Color color, bool isMine)
     {
         this.id = id;
 
         this.isMine = isMine;
+
+        sr.color = color;
 
         if (isMine)
         {
@@ -49,7 +50,7 @@ public class NetworkPlayer : MonoBehaviour
         {
             movement.enabled = false;
             crossHair.SetActive(false);
-            StopCoroutine(receiveMovementCoroutine);
+            StopCoroutine(sendInputCoroutine);
         }
     }
 
@@ -63,7 +64,7 @@ public class NetworkPlayer : MonoBehaviour
 
     private IEnumerator SendInputRoutine()
     {
-        yield return new WaitForSeconds(1);
+        var sendRateHandel = new WaitForSeconds(1 / sendRate);
 
         while (true)
         {
@@ -71,9 +72,7 @@ public class NetworkPlayer : MonoBehaviour
 
             movement.SetVelocity(direction);
 
-            networkObjectManager.SendInput(direction, transform.eulerAngles.z);
-
-            Debug.Log($"Rotation sended { transform.eulerAngles.z}");
+            networkMovementManager.SendInput(direction, transform.eulerAngles.z);
 
             yield return sendRateHandel;
         }

@@ -8,7 +8,7 @@ public class Movement : MonoBehaviour
     private float lerpSpeed;
 
     [SerializeField]
-    private float serverSpeed;
+    private float moveSpeed;
 
     private void Awake()
     {
@@ -25,14 +25,14 @@ public class Movement : MonoBehaviour
         transform.up = directionToMouse;
     }
 
-    public void SetVelocity(Vector2 velocity)
+    public void SetVelocity(Vector2 direction)
     {
-        rb.velocity = velocity * serverSpeed;
+        rb.velocity = direction * moveSpeed;
     }
 
     public void Move(Vector2 position)
     {
-        if (Vector2.Distance(transform.position, position) < serverSpeed)
+        if (Vector2.Distance(transform.position, position) < moveSpeed)
         {
             rb.MovePosition(Vector3.MoveTowards(rb.position, position, lerpSpeed * Time.deltaTime));
         }
