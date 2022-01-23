@@ -89,7 +89,7 @@ public class NetworkObjectManager : SystemBase
         {
             var localObject = ToLocalObject(serverMessage.Objects(i).Value);
 
-            Debug.Log(localObject.angle);
+            //Debug.Log($"Rotation received {localObject.angle}");
 
             if (players.TryGetValue(localObject.id, out var netOjbect))
             {

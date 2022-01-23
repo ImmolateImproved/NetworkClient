@@ -15,6 +15,7 @@ public class UDPSocket : NetworkSocket
     public override void Close()
     {
         connection?.Close();
+        connection?.Dispose();
     }
 
     public override void Send(byte[] data)

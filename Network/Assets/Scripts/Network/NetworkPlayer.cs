@@ -57,7 +57,7 @@ public class NetworkPlayer : MonoBehaviour
     {
         movement.Move(position);
 
-        if (isMine)
+        if (!isMine)
             movement.Rotate(angle);
     }
 
@@ -72,6 +72,8 @@ public class NetworkPlayer : MonoBehaviour
             movement.SetVelocity(direction);
 
             networkObjectManager.SendInput(direction, transform.eulerAngles.z);
+
+            Debug.Log($"Rotation sended { transform.eulerAngles.z}");
 
             yield return sendRateHandel;
         }
