@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 333a85f95eee0ea43a677f3963ac4ec6, type: 3}
-  m_Name: NetworkObjectManager
+  m_Name: NetworkPlayersManager
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 8026997594043670675, guid: a1963296b4b38634c9716fd8424d09d3, type: 3}
   colors:

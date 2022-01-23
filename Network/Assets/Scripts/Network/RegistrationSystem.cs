@@ -10,7 +10,7 @@ public class RegistrationSystem : SystemBase
 {
     private NetworkManager networkManager;
 
-    private NetworkObjectManager networkObjectManager;
+    private NetworkPlayersManager networkObjectManager;
 
     private FlatBufferBuilder fb;
 
@@ -21,7 +21,7 @@ public class RegistrationSystem : SystemBase
     public override void Init()
     {
         networkManager = SystemsManager.GetSystem<NetworkManager>();
-        networkObjectManager = SystemsManager.GetSystem<NetworkObjectManager>();
+        networkObjectManager = SystemsManager.GetSystem<NetworkPlayersManager>();
 
         fb = new FlatBufferBuilder(1);
     }

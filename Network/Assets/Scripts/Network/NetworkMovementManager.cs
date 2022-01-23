@@ -4,14 +4,24 @@ using Main_message;
 using ServerMessages;
 using UnityEngine;
 
+public struct LocalPlayer
+{
+    public byte id;
+    public Vector2 position;
+    public float angle;
+}
+
 [CreateAssetMenu(menuName = "ScriptableObjects/Systems/NetworkMovementManager")]
 public class NetworkMovementManager : SystemBase
 {
     private NetworkManager networkManager;
 
-    private NetworkObjectManager networkObjectManager;
+    private NetworkPlayersManager networkPlayerManager;
 
     private FlatBufferBuilder fb;
+
+    [field: SerializeField]
+    public float SendRate { get; private set; }
 
     private uint lastSendMessageId;
     private uint lastReceiveMessageId;
@@ -19,7 +29,7 @@ public class NetworkMovementManager : SystemBase
     public override void Init()
     {
         networkManager = SystemsManager.GetSystem<NetworkManager>();
-        networkObjectManager = SystemsManager.GetSystem<NetworkObjectManager>();
+        networkPlayerManager = SystemsManager.GetSystem<NetworkPlayersManager>();
 
         fb = new FlatBufferBuilder(1);
     }
@@ -60,13 +70,13 @@ public class NetworkMovementManager : SystemBase
         {
             var localObject = ToLocalObject(serverMessage.Objects(i).Value);
 
-            if (networkObjectManager.TryGetNetObject(localObject.id, out var netOjbect))
+            if (networkPlayerManager.TryGetNetPlayer(localObject.id, out var netOjbect))
             {
                 netOjbect.ReceivePosition(localObject.position, localObject.angle);
             }
             else
             {
-                networkObjectManager.SpawnNetworkObject(localObject.id, false);
+                networkPlayerManager.SpawnNetworkObject(localObject.id, false);
             }
         }
     }
@@ -108,5 +118,4 @@ public class NetworkMovementManager : SystemBase
 
         return data;
     }
-
 }

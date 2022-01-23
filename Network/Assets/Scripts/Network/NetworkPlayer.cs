@@ -1,6 +1,8 @@
 ﻿using Cinemachine;
-using System.Collections;
+using MEC;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class NetworkPlayer : MonoBehaviour
 {
@@ -9,14 +11,11 @@ public class NetworkPlayer : MonoBehaviour
     private PlayerInput playerInput;
     private Movement movement;
 
-    [SerializeField]
-    private float sendRate;
-
     private int id;
 
     private bool isMine;
 
-    private Coroutine sendInputCoroutine;
+    private CoroutineHandle sendInputCoroutine;
 
     private SpriteRenderer sr;
 
@@ -30,8 +29,11 @@ public class NetworkPlayer : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         movement = GetComponent<Movement>();
         sr = GetComponent<SpriteRenderer>();
+    }
 
-        sendInputCoroutine = StartCoroutine(SendInputRoutine());
+    private void OnDestroy()
+    {
+        Timing.KillCoroutines(sendInputCoroutine);
     }
 
     public void Init(int id, Color color, bool isMine)
@@ -45,12 +47,12 @@ public class NetworkPlayer : MonoBehaviour
         if (isMine)
         {
             FindObjectOfType<CinemachineVirtualCamera>().Follow = transform;
+            sendInputCoroutine = Timing.RunCoroutine(SendInputRoutine());
         }
         else
         {
             movement.enabled = false;
             crossHair.SetActive(false);
-            StopCoroutine(sendInputCoroutine);
         }
     }
 
@@ -59,22 +61,29 @@ public class NetworkPlayer : MonoBehaviour
         movement.Move(position);
 
         if (!isMine)
+        {
             movement.Rotate(angle);
+        }
     }
 
-    private IEnumerator SendInputRoutine()
+    public void SendInput()
     {
-        var sendRateHandel = new WaitForSeconds(1 / sendRate);
+        var direction = playerInput.GetInput();
+
+        movement.SetInputDirection(direction);
+
+        networkMovementManager.SendInput(direction, transform.eulerAngles.z);
+    }
+
+    private IEnumerator<float> SendInputRoutine()
+    {
+        var delay = 1 / networkMovementManager.SendRate;
 
         while (true)
         {
-            var direction = playerInput.GetInput();
+            SendInput();
 
-            movement.SetVelocity(direction);
-
-            networkMovementManager.SendInput(direction, transform.eulerAngles.z);
-
-            yield return sendRateHandel;
+            yield return Timing.WaitForSeconds(delay);
         }
     }
 }

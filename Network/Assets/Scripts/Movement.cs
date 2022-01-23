@@ -10,6 +10,11 @@ public class Movement : MonoBehaviour
     [SerializeField]
     private float moveSpeed;
 
+    [SerializeField]
+    private float rotationSpeed;
+
+    private Vector2 inputDirection;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -17,17 +22,32 @@ public class Movement : MonoBehaviour
 
     private void Update()
     {
+        MouseLook();
+    }
+
+    private void FixedUpdate()
+    {
+        rb.velocity = inputDirection * moveSpeed;
+    }
+
+    private void MouseLook()
+    {
         var mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = 0;
 
         var directionToMouse = (mouseWorldPos - transform.position).normalized;
 
         transform.up = directionToMouse;
+
+        //var angle = Mathf.Atan2(directionToMouse.y, directionToMouse.x) * Mathf.Rad2Deg - 90;
+        //var rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+        //transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
     }
 
-    public void SetVelocity(Vector2 direction)
+    public void SetInputDirection(Vector2 direction)
     {
-        rb.velocity = direction * moveSpeed;
+        inputDirection = direction.normalized;
     }
 
     public void Move(Vector2 position)

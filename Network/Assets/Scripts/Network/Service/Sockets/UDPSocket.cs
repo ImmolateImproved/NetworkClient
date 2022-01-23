@@ -25,7 +25,7 @@ public class UDPSocket : NetworkSocket
 
     private async void Receive()
     {
-        while (true)
+        while (connection.Client != null)
         {
             var result = await connection.ReceiveAsync();
 
