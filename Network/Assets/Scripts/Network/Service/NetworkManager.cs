@@ -17,6 +17,8 @@ public class NetworkManager : SystemBase
 
     public event Action OnConnect;
 
+    public uint LastSendMessageId { get; private set; }
+
     public byte NetworkID { get; set; }
 
     public override void Init()
@@ -70,7 +72,8 @@ public class NetworkManager : SystemBase
 
     public void Send(byte[] data)
     {
-        socket?.Send(data);
+        LastSendMessageId++;
+        socket.Send(data);
     }
 
     public void On(int type, Action<NetworkMessage> action)
@@ -81,5 +84,17 @@ public class NetworkManager : SystemBase
     public void Off(int type, Action<NetworkMessage> action)
     {
         eventManager.Off(type, action);
+    }
+
+    public byte[] CreateMainMessage(FlatBufferBuilder fb, message_type message_Type, byte[] data, bool isRequire)
+    {
+        fb.Clear();
+
+        var dataOffset = main.CreateDataVector(fb, data);
+
+        var offset = main.Createmain(fb, LastSendMessageId, isRequire, message_Type, dataOffset);
+        main.FinishmainBuffer(fb, offset);
+
+        return fb.SizedByteArray();
     }
 }

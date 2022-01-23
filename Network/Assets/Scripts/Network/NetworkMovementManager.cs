@@ -1,6 +1,7 @@
 ﻿using ClientMessages;
 using FlatBuffers;
 using Main_message;
+using messages_shot;
 using ServerMessages;
 using UnityEngine;
 
@@ -23,7 +24,6 @@ public class NetworkMovementManager : SystemBase
     [field: SerializeField]
     public float SendRate { get; private set; }
 
-    private uint lastSendMessageId;
     private uint lastReceiveMessageId;
 
     public override void Init()
@@ -46,9 +46,9 @@ public class NetworkMovementManager : SystemBase
 
     public void SendInput(Vector2 direction, float angle)
     {
-        var data = CreateInputMessage(direction, angle, lastSendMessageId);
+        var directionData = SerializeDirection(direction, angle);
 
-        lastSendMessageId++;
+        var data = networkManager.CreateMainMessage(fb, message_type.Move, directionData, false);
 
         networkManager.Send(data);
     }
@@ -89,20 +89,6 @@ public class NetworkMovementManager : SystemBase
             position = new Vector2(netObject.X, netObject.Y),
             angle = netObject.Ang
         };
-    }
-
-    private byte[] CreateInputMessage(Vector2 direction, float angle, uint lastMessageId)
-    {
-        var data = SerializeDirection(direction, angle);
-
-        fb.Clear();
-
-        var dataOffset = main.CreateDataVector(fb, data);
-
-        var offset = main.Createmain(fb, lastMessageId, false, message_type.Move, dataOffset);
-        main.FinishmainBuffer(fb, offset);
-
-        return fb.SizedByteArray();
     }
 
     private byte[] SerializeDirection(Vector2 direction, float angle)

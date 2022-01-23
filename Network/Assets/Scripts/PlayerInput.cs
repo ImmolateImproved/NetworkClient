@@ -20,6 +20,13 @@ public class PlayerInput : MonoBehaviour
         {new Vector2(-1, 1) , vector.UpLeft}
     };
 
+    private Camera mainCamera;
+
+    private void Awake()
+    {
+        mainCamera = Camera.main;
+    }
+
     public Vector2 GetInput()
     {
         var h = Input.GetAxisRaw(Horizontal);
@@ -28,5 +35,10 @@ public class PlayerInput : MonoBehaviour
         var direction = new Vector2(h, v);
 
         return direction;
+    }
+
+    public Vector2 GetMousePosition()
+    {
+        return mainCamera.ScreenToWorldPoint(Input.mousePosition);
     }
 }

@@ -12,6 +12,8 @@ public enum message_type : byte
   Pong = 2,
   Answer = 3,
   Move = 4,
+  Shot = 5,
+  State = 6,
 };
 
 

@@ -7,9 +7,11 @@ using UnityEngine.Events;
 public class NetworkPlayer : MonoBehaviour
 {
     private NetworkMovementManager networkMovementManager;
+    private NetworkWeponManager networkWeponManager;
 
     private PlayerInput playerInput;
     private Movement movement;
+    private Weapon weapon;
 
     private int id;
 
@@ -34,6 +36,11 @@ public class NetworkPlayer : MonoBehaviour
     private void OnDestroy()
     {
         Timing.KillCoroutines(sendInputCoroutine);
+    }
+
+    private void Update()
+    {
+        StartShot();
     }
 
     public void Init(int id, Color color, bool isMine)
@@ -73,6 +80,20 @@ public class NetworkPlayer : MonoBehaviour
         movement.SetInputDirection(direction);
 
         networkMovementManager.SendInput(direction, transform.eulerAngles.z);
+    }
+
+    public void StartShot()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            weapon.StartShot();
+            networkWeponManager.SendShotEvent(playerInput.GetMousePosition());
+        }
+    }
+
+    public void Shot(Vector2 targetPosition)
+    {
+        weapon.Shot(targetPosition);
     }
 
     private IEnumerator<float> SendInputRoutine()
